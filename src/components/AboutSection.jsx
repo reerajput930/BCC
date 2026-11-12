@@ -49,12 +49,12 @@ export default function AboutSection() {
 
   return (
     <section className="about" aria-labelledby="about-title">
-      <div className="about__anise">
+      <div className="about__anise" data-reveal="left">
         <img src={starAnise1} alt="" />
         <img src={starAnise2} alt="" />
         <img src={starAnise3} alt="" />
       </div>
-      <div className="about__body">
+      <div className="about__body" data-reveal="right">
         <h2 id="about-title" className="about__title">
           {t({ de: 'Über uns', en: 'About Us' })}
         </h2>

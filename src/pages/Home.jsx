@@ -182,8 +182,10 @@ function WeeklyThali() {
 
   return (
     <section className="home-thali" aria-labelledby="home-thali-title">
-      <ThaliPlate className="home-thali__plate" />
-      <div className="home-thali__text">
+      <div className="home-thali__plate" data-reveal="left">
+        <ThaliPlate />
+      </div>
+      <div className="home-thali__text" data-reveal="right">
         <p className="home-eyebrow">{t({ de: `Diese Woche · KW ${week}`, en: `This week · CW ${week}` })}</p>
         <h2 id="home-thali-title" className="home-thali__title">
           {thali.name}
@@ -233,7 +235,7 @@ export default function Home() {
           alt={t(hero.alt)}
           fetchPriority="high"
         />
-        <div className="hero__content">
+        <div className="hero__content" data-reveal="up">
           <p className="hero__welcome" lang="hi">
             आपका स्वागत है
           </p>
@@ -254,20 +256,27 @@ export default function Home() {
       {/* Hello in many Indian languages, over a skyline of landmarks */}
       <section className="namaste" aria-labelledby="namaste-title">
         <NamasteGreeting />
-        <p className="namaste__line">{t(namasteLine)}</p>
+        <p className="namaste__line" data-reveal="up">{t(namasteLine)}</p>
         <div className="namaste__skyline">
           <img src={skyline} width="1728" height="1372" alt={t(skylineAlt)} />
         </div>
       </section>
 
       <section className="home-intro" aria-label={t({ de: 'Über unsere Küche', en: 'About our kitchen' })}>
-        <div className="home-intro__text">
+        <div className="home-intro__text" data-reveal="left">
           <p className="home-intro__statement">{t(intro.statement)}</p>
           <p className="home-intro__stat">
             <strong>{t(intro.stat.value)}</strong> {t(intro.stat.label)}
           </p>
         </div>
-        <img className="home-intro__photo" src={kitchenRecipes} width="603" height="401" alt={t(intro.photoAlt)} />
+        <img
+          className="home-intro__photo"
+          data-reveal="right"
+          src={kitchenRecipes}
+          width="603"
+          height="401"
+          alt={t(intro.photoAlt)}
+        />
       </section>
 
       <AboutSection />
@@ -278,7 +287,7 @@ export default function Home() {
         </h2>
         <ol className="home-timeline__list">
           {milestones.map((milestone, i) => (
-            <li key={i} className="home-timeline__item">
+            <li key={i} className="home-timeline__item" data-reveal="up" style={{ '--reveal-delay': `${i * 0.12}s` }}>
               <p className="home-timeline__year">
                 {milestone.year ?? <Placeholder>{t({ de: 'Jahr', en: 'Year' })}</Placeholder>}
               </p>
@@ -290,13 +299,18 @@ export default function Home() {
       </section>
 
       <section className="home-menu" aria-labelledby="home-menu-title">
-        <h2 id="home-menu-title" className="home-menu__title">
+        <h2 id="home-menu-title" className="home-menu__title" data-reveal="up">
           {t({ de: 'Unsere Speisekarte', en: 'Our Menu' })}
         </h2>
-        <p className="home-menu__intro">{t({ de: 'Fünf Wege, Indien zu schmecken.', en: 'Five ways to taste India.' })}</p>
+        <p className="home-menu__intro" data-reveal="up">{t({ de: 'Fünf Wege, Indien zu schmecken.', en: 'Five ways to taste India.' })}</p>
         <ul className="home-menu__tiles">
-          {menuTiles.map((tile) => (
-            <li key={tile.title.en} className="home-menu__tile">
+          {menuTiles.map((tile, i) => (
+            <li
+              key={tile.title.en}
+              className="home-menu__tile"
+              data-reveal="up"
+              style={{ '--reveal-delay': `${i * 0.08}s` }}
+            >
               <h3>{t(tile.title)}</h3>
               <p>{t(tile.text)}</p>
             </li>

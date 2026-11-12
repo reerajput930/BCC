@@ -47,7 +47,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="site-footer__inner">
         <div className="site-footer__grid">
-          <div className="footer-brand">
+          <div className="footer-brand" data-reveal="up">
             <p className="footer-brand__name">
               <LogoMark />
               {name}
@@ -72,7 +72,7 @@ export default function Footer() {
             </form>
           </div>
 
-          <nav className="footer-col" aria-labelledby="footer-explore">
+          <nav className="footer-col" aria-labelledby="footer-explore" data-reveal="up" style={{ '--reveal-delay': '0.08s' }}>
             <h2 id="footer-explore">{t({ de: 'Entdecken', en: 'Explore' })}</h2>
             <ul className="footer-links">
               {exploreLinks.map((link) => (
@@ -83,7 +83,7 @@ export default function Footer() {
             </ul>
           </nav>
 
-          <nav className="footer-col" aria-labelledby="footer-order">
+          <nav className="footer-col" aria-labelledby="footer-order" data-reveal="up" style={{ '--reveal-delay': '0.16s' }}>
             <h2 id="footer-order">{t({ de: 'Bestellen', en: 'Order' })}</h2>
             <ul className="footer-links">
               <li>
@@ -101,7 +101,7 @@ export default function Footer() {
             </ul>
           </nav>
 
-          <section className="footer-col" aria-labelledby="footer-visit">
+          <section className="footer-col" aria-labelledby="footer-visit" data-reveal="up" style={{ '--reveal-delay': '0.24s' }}>
             <h2 id="footer-visit">{t({ de: 'Besuch', en: 'Visit' })}</h2>
             <address className="footer-brand__address">
               <ExternalLink href={mapsUrl}>

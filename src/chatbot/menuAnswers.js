@@ -2,7 +2,7 @@
 // about them (price, allergens, vegetarian/vegan, spice), and the reply.
 // Allergen answers only repeat what the menu prints and always point to our team:
 // the bot never says a dish is safe for someone.
-import { additiveNames, allergenNames, dishes, menuSections } from '../src/menu.js'
+import { additiveNames, allergenNames, dishes, menuSections } from '../menu.js'
 import { similarWord, words } from './text.js'
 
 const sections = new Map(menuSections.map((section) => [section.id, section]))

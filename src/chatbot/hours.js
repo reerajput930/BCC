@@ -1,5 +1,5 @@
 // "Are we open right now?" for the chat bot, from siteInfo.openingHours, in Stuttgart time.
-import { siteInfo } from '../src/siteInfo.js'
+import { siteInfo } from '../siteInfo.js'
 
 const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 const dayNames = {

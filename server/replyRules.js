@@ -1,5 +1,6 @@
-// Picks the replies to a chat message, for the website chat and the WhatsApp bot, from the
-// answers in src/chatConfig.js and the dishes in src/menu.js:
+// Picks the replies to a chat message for the WhatsApp bot (switched off; the website chat now
+// answers in the browser, src/chatbot/replies.js), from the answers in src/chatConfig.js and the
+// dishes in src/menu.js:
 // 1. a menu number on WhatsApp ("2") gets that topic;
 // 2. a message that is only small talk ("thanks!", "hi") gets a small-talk reply;
 // 3. a greeting in front of a question is answered together with the question;
@@ -9,21 +10,21 @@
 //    answers are offered as suggestions; when nothing fits, the fallback (and it's logged).
 // The chat sends back the `context` of the previous reply, for follow-ups like "how much is it?".
 import { chatConfig } from '../src/chatConfig.js'
-import { closureNotice, openNowLine } from './hours.js'
-import { detectIntent, dishAnswer, dishesNamed, findDishes, intentIds } from './menuAnswers.js'
+import { closureNotice, openNowLine } from '../src/chatbot/hours.js'
+import { detectIntent, dishAnswer, dishesNamed, findDishes, intentIds } from '../src/chatbot/menuAnswers.js'
 import { embed, loadModel, similarity } from './semantic.js'
-import { detectLanguage, keywordHits, words } from './text.js'
+import { detectLanguage, keywordHits, words } from '../src/chatbot/text.js'
 import { logUnanswered } from './unanswered.js'
 
 const topics = chatConfig.quickReplies
 const answers = [...topics, ...chatConfig.faqs]
 const answerById = new Map(answers.map((entry) => [entry.id, entry]))
-const menu = topics.map((topic, i) => `${i + 1}. ${topic.label}`).join('\n')
+const menu = topics.map((topic, i) => `${i + 1}. ${topic.label.en}`).join('\n')
 
 // When one of these is closest, the question isn't about us and the bot says it doesn't know
 const offTopic = {
   id: 'off-topic',
-  label: 'Off topic',
+  label: { en: 'Off topic', de: 'Themenfremd' },
   examples: [
     'What is the weather today?',
     'Tell me a joke',
@@ -62,7 +63,9 @@ let index = null // [{ entry, vector }] for every example, once the model has lo
 // messages are matched by keywords only.
 export async function prepareReplies() {
   await loadModel()
-  const items = [...answers, offTopic].flatMap((entry) => [entry.label, ...entry.examples].map((text) => ({ entry, text })))
+  const items = [...answers, offTopic].flatMap((entry) =>
+    [entry.label.en, entry.label.de, ...entry.examples].map((text) => ({ entry, text })),
+  )
   const vectors = await embed(items.map((item) => item.text))
   index = items.map((item, i) => ({ entry: item.entry, vector: vectors[i] }))
 }
@@ -79,7 +82,7 @@ export async function replyFor(text, { channel = 'web', context: previous } = {}
 
   const number = channel === 'whatsapp' && text.trim().match(/^(\d+)\.?$/)?.[1]
   const numbered = number && topics[Number(number) - 1]
-  if (numbered) return topicReply(numbered.id, { channel, lang, rule: `menu ${number}: ${numbered.label}` })
+  if (numbered) return topicReply(numbered.id, { channel, lang, rule: `menu ${number}: ${numbered.label.en}` })
 
   const talk = smallTalk(said)
   if (talk) {
@@ -196,7 +199,7 @@ async function answerQuestion(text, lang, context, channel) {
       replies: [
         {
           text: chatConfig.unsureReply[lang],
-          suggestions: likely.map(({ entry }) => ({ label: entry.label, topic: entry.id })),
+          suggestions: likely.map(({ entry }) => ({ label: entry.label[lang], topic: entry.id })),
         },
       ],
       context: {},
@@ -247,7 +250,7 @@ function entryReply(entry, lang, channel) {
     text,
     link: entry.link?.href ? { label: entry.link.label[lang], href: entry.link.href } : undefined,
     handoff: entry.handoff || undefined,
-    suggestions: entry.related?.map((id) => ({ label: answerById.get(id).label, topic: id })),
+    suggestions: entry.related?.map((id) => ({ label: answerById.get(id).label[lang], topic: id })),
   }
 }
 

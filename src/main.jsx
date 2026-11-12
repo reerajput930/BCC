@@ -12,6 +12,12 @@ import '@fontsource-variable/archivo/wdth.css'
 import './index.css'
 import App from './App.jsx'
 
+// Turns on the scroll reveal (see Layout.jsx) before the first paint, so nothing flashes up and
+// then disappears again. Not for visitors who asked their device for less motion.
+if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.documentElement.classList.add('js-reveal')
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />

@@ -65,10 +65,10 @@ export default function Catering() {
       />
 
       <section className="contact-hero" aria-labelledby="catering-title">
-        <h1 id="catering-title" className="contact-hero__title">
+        <h1 id="catering-title" className="contact-hero__title" data-reveal="left">
           Catering
         </h1>
-        <div className="contact-hero__aside">
+        <div className="contact-hero__aside" data-reveal="right">
           <p className="contact-hero__intro">
             <strong>{t(intro.lead)}</strong> {t(intro.rest)}
           </p>
@@ -80,15 +80,15 @@ export default function Catering() {
       </section>
 
       <ul className="catering-offer" aria-label={t({ de: 'Wofür wir kochen', en: 'What we cater for' })}>
-        {occasions.map((occasion) => (
-          <li key={occasion.title.en}>
+        {occasions.map((occasion, i) => (
+          <li key={occasion.title.en} data-reveal="up" style={{ '--reveal-delay': `${i * 0.1}s` }}>
             <h3>{t(occasion.title)}</h3>
             <p>{t(occasion.text)}</p>
           </li>
         ))}
       </ul>
 
-      <section className="catering-details" aria-labelledby="catering-details-title">
+      <section className="catering-details" aria-labelledby="catering-details-title" data-reveal="up">
         <h2 id="catering-details-title" className="contact-label">
           {t({ de: 'Gut zu wissen', en: 'Good to know' })}
         </h2>
@@ -106,7 +106,9 @@ export default function Catering() {
         <h2 id="catering-form-title" className="contact-order__title">
           {t({ de: 'Catering anfragen', en: 'Send an enquiry' })}
         </h2>
-        <EnquiryForm kind="catering" />
+        <div data-reveal="up">
+          <EnquiryForm kind="catering" />
+        </div>
       </section>
     </div>
   )

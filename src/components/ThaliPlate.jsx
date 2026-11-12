@@ -2,11 +2,11 @@ import { weeklySpecial } from '../weeklySpecial.js'
 
 // This week's thali, put together from the dish pictures on a steel plate (until there's a photo
 // of it): one dish in the middle, the rest around it
-export default function ThaliPlate({ className }) {
+export default function ThaliPlate({ className = '' }) {
   const centre = weeklySpecial.dishes.find((dish) => dish.plateCentre)
   const around = weeklySpecial.dishes.filter((dish) => dish !== centre)
   return (
-    <div className={`ws-plate ${className}`} aria-hidden="true">
+    <div className={`ws-plate ${className}`.trim()} aria-hidden="true">
       {centre && <img className="ws-plate__centre" src={centre.image} alt="" />}
       {around.map((dish, i) => {
         const angle = (i / around.length) * 2 * Math.PI - Math.PI / 2

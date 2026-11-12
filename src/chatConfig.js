@@ -1,18 +1,21 @@
 import { dishes, menuSections } from './menu.js'
 import { hoursLines, siteInfo } from './siteInfo.js'
 
-// What the website chat bot knows and says. The server picks the answers (server/replyRules.js);
-// questions about single dishes are answered from src/menu.js (server/menuAnswers.js).
+// What the website chat bot knows and says. The answers are picked in the visitor's browser
+// (src/chatbot/replies.js); questions about single dishes are answered from src/menu.js
+// (src/chatbot/menuAnswers.js).
 //
 // Each answer has:
 // - id: stable name, used by the topic buttons, suggestions and logs.
-// - label: button and suggestion text.
-// - examples: ways people ask for it, English and German. The server compares a message with
-//   these by meaning, so a few varied, natural questions work better than many similar ones.
-// - keywords: give an answer a head start when a word in the message starts with one of them
-//   ('deliver' also finds 'delivery'); one with a space ('pick up') matches those words in a row.
+// - label: { en, de } button and suggestion text.
+// - examples: ways people ask for it, English and German. A message that shares words with an
+//   example (typos allowed) leans towards that answer, so varied, natural questions help most.
+// - keywords: count most. A word in the message that starts with one matches ('deliver' also
+//   finds 'delivery'); one with a space ('pick up') matches those words in a row.
+// - exact: short words that only count on their own ('wo', not 'woche').
 // - reply: { en, de }. A list picks one text at random; a function gets the language.
-// - link: { label: { en, de }, href }; an href starting with '/' is a page on this site.
+// - link: { label: { en, de }, href } to another site, or { label, page, hash? } for a page of
+//   this site in the visitor's language (page: a key of `pages` in src/i18n.js).
 // - handoff: shows the "Open WhatsApp" button to reach our team.
 // - related: ids of answers offered as follow-up suggestions.
 // German answers use "Sie". TO CONFIRM marks answers waiting for details from the client.
@@ -41,13 +44,16 @@ function priceRanges(lang) {
 }
 
 export const chatConfig = {
-  welcome: 'Hi! 👋 Ask me about our food, hours or catering – in English or German.',
+  welcome: {
+    en: 'Hi! 👋 Ask me about our food, hours or catering – in English or German.',
+    de: 'Hallo! 👋 Fragen Sie mich nach Essen, Öffnungszeiten oder Catering – auf Deutsch oder Englisch.',
+  },
 
   // Shown as buttons in the website chat and as a numbered menu on WhatsApp
   quickReplies: [
     {
       id: 'hours',
-      label: 'Hours',
+      label: { en: 'Hours', de: 'Öffnungszeiten' },
       examples: [
         'What are your opening hours?',
         'When are you open?',
@@ -63,7 +69,12 @@ export const chatConfig = {
         'Wann macht ihr zu?',
         'Bis wann kann man kommen?',
       ],
-      keywords: ['hour', 'open', 'clos', 'timing', 'timming', 'time', 'today', 'tonight', 'öffnungszeit', 'geöffnet', 'offen', 'heute', 'feiertag'],
+      keywords: [
+        'hour', 'open', 'clos', 'timing', 'timming', 'time', 'today', 'tonight', 'weekend',
+        'monday', 'tuesday', 'wednesday', 'thursday', 'saturday', 'sunday',
+        'öffnungszeit', 'geöffnet', 'offen', 'heute', 'feiertag', 'uhrzeit', 'wochenende',
+        'montag', 'dienstag', 'mittwoch', 'donnerstag', 'samstag', 'sonntag', 'macht ihr zu', 'habt ihr auf',
+      ],
       // The server adds whether we're open right now and any closures in the coming days
       reply: (lang) =>
         `${lang === 'de' ? 'Unsere Öffnungszeiten:' : 'Our opening hours:'}\n${hoursLines(lang).join('\n')}`,
@@ -71,7 +82,7 @@ export const chatConfig = {
     },
     {
       id: 'location',
-      label: 'Location',
+      label: { en: 'Location', de: 'Adresse' },
       examples: [
         'Where are you?',
         'What is your address?',
@@ -83,7 +94,8 @@ export const chatConfig = {
         'Wie ist Ihre Adresse?',
         'Wie komme ich zu euch?',
       ],
-      keywords: ['where', 'location', 'address', 'find', 'direction', 'map', 'vaihingen', 'adresse', 'anfahrt', 'standort'],
+      keywords: ['where', 'location', 'address', 'find', 'direction', 'map', 'vaihingen', 'adresse', 'anfahrt', 'standort', 'komme ich', 'finde ich'],
+      exact: ['wo'],
       reply: {
         en: `You’ll find us at ${fullAddress} 📍`,
         de: `Sie finden uns in der ${fullAddress} 📍`,
@@ -97,7 +109,7 @@ export const chatConfig = {
     {
       // TO CONFIRM: dine-in and seating
       id: 'services',
-      label: 'Services',
+      label: { en: 'Services', de: 'Angebot' },
       examples: [
         'What services do you offer?',
         'Can I eat at the restaurant?',
@@ -116,7 +128,7 @@ export const chatConfig = {
     {
       // CHECK wording of the three kitchens with the client
       id: 'food',
-      label: 'Our food',
+      label: { en: 'Our food', de: 'Unser Essen' },
       examples: [
         'What food do you serve?',
         'What is on the menu?',
@@ -133,12 +145,12 @@ export const chatConfig = {
         en: 'Regional Indian cooking from three kitchens: Goan (from Goa), Dakshin (South India) and Nawabi (rich, royal-style dishes) 🍛\n• Gourmet Teller – a plate with rice\n• Grand Thali – a full platter that changes every week\n• Street-food starters like Vada Pav\n• Biryani on Fridays\n• Lassis and Indian drinks\nAsk me about any dish – its price, allergens or what’s in it.',
         de: 'Regionale indische Küche aus drei Regionen: Goan (aus Goa), Dakshin (Südindien) und Nawabi (reichhaltige, königliche Gerichte) 🍛\n• Gourmet Teller – ein Teller mit Reis\n• Grand Thali – eine große Platte, jede Woche neu\n• Streetfood-Vorspeisen wie Vada Pav\n• Biryani am Freitag\n• Lassis und indische Getränke\nFragen Sie mich nach jedem Gericht – Preis, Allergene oder Zutaten.',
       },
-      link: { label: { en: 'See the full menu', de: 'Zur Speisekarte' }, href: '/menu' },
+      link: { label: { en: 'See the full menu', de: 'Zur Speisekarte' }, page: 'menu' },
       related: ['prices', 'vegetarian', 'weekly'],
     },
     {
       id: 'wolt',
-      label: 'Order on Wolt',
+      label: { en: 'Order', de: 'Bestellen' },
       examples: [
         'Can I order online?',
         'Do you deliver?',
@@ -151,18 +163,18 @@ export const chatConfig = {
         'Kann ich online bestellen?',
         'Bringt ihr das Essen nach Hause?',
       ],
-      keywords: ['wolt', 'uber', 'order', 'deliver', 'online', 'nach hause', 'bestell', 'liefer'],
+      keywords: ['wolt', 'uber', 'order', 'deliver', 'online', 'webshop', 'shop', 'nach hause', 'bestell', 'liefer', 'bring'],
       reply: {
-        en: 'Hungry? Order for delivery on Wolt or Uber Eats 🛵 The app shows whether we deliver to your address, the fee and the minimum order. Or pick up yourself and get 15% off!',
-        de: 'Hunger? Bestellen Sie über Wolt oder Uber Eats 🛵 Die App zeigt Ihnen, ob wir an Ihre Adresse liefern, die Liefergebühr und den Mindestbestellwert. Oder holen Sie selbst ab und sparen Sie 15 %!',
+        en: 'Hungry? 🛵 Order in our web shop and pick it up yourself (15% off), or get it delivered with Wolt or Uber Eats – the app shows whether we deliver to your address, the fee and the minimum order.',
+        de: 'Hunger? 🛵 Bestellen Sie in unserem Webshop und holen Sie selbst ab (15 % Rabatt), oder lassen Sie liefern – über Wolt oder Uber Eats. Die App zeigt Ihnen, ob wir an Ihre Adresse liefern, die Liefergebühr und den Mindestbestellwert.',
       },
-      link: { label: { en: 'Open Wolt', de: 'Wolt öffnen' }, href: siteInfo.orderLinks.wolt },
+      link: { label: { en: 'All ways to order', de: 'Alle Bestellwege' }, page: 'contact', hash: '#order' },
       related: ['pickup', 'prices'],
     },
     {
       // TO CONFIRM: guest numbers, notice, deposit and packages, then answer them here
       id: 'catering',
-      label: 'Catering',
+      label: { en: 'Catering', de: 'Catering' },
       examples: [
         'Do you do catering?',
         'Can you cater my party?',
@@ -178,6 +190,7 @@ export const chatConfig = {
         en: 'We’d love to cater your event! 🎉 Tell our team the date, the number of guests and where it takes place, and we’ll send you an offer.',
         de: 'Wir kochen gern für Ihre Feier! 🎉 Schreiben Sie unserem Team das Datum, die Anzahl der Gäste und den Ort – wir schicken Ihnen ein Angebot.',
       },
+      link: { label: { en: 'Send a catering enquiry', de: 'Catering anfragen' }, page: 'catering', hash: '#enquiry' },
       handoff: true,
       related: ['food', 'prices'],
     },
@@ -185,7 +198,7 @@ export const chatConfig = {
       // Hands the customer over to our team: the chat shows an "Open WhatsApp" button
       // (siteInfo.whatsapp number + pre-filled message) and the email address as a fallback.
       id: 'human',
-      label: 'Talk to human',
+      label: { en: 'Talk to our team', de: 'Mit dem Team sprechen' },
       handoff: true,
       examples: [
         'Can I talk to a real person?',
@@ -211,7 +224,7 @@ export const chatConfig = {
   faqs: [
     {
       id: 'vegetarian',
-      label: 'Vegetarian & vegan',
+      label: { en: 'Vegetarian & vegan', de: 'Vegetarisch & vegan' },
       examples: [
         'Do you have vegetarian food?',
         'Is there anything vegan?',
@@ -230,7 +243,7 @@ export const chatConfig = {
     },
     {
       id: 'allergies',
-      label: 'Allergies',
+      label: { en: 'Allergies', de: 'Allergien' },
       examples: [
         'I have a nut allergy',
         'Which dishes are gluten-free?',
@@ -245,13 +258,13 @@ export const chatConfig = {
         en: 'Every dish on our menu lists its allergens (A = gluten, G = milk, H = nuts, and so on). Ask me about a dish – for example “allergens in Vada Pav”.\nIf you have a severe allergy, please check with our team before you order.',
         de: 'Auf unserer Speisekarte stehen bei jedem Gericht die Allergene (A = Gluten, G = Milch, H = Schalenfrüchte usw.). Fragen Sie mich nach einem Gericht – zum Beispiel „Allergene im Vada Pav“.\nBei einer schweren Allergie sprechen Sie bitte vor der Bestellung mit unserem Team.',
       },
-      link: { label: { en: 'Allergen information', de: 'Allergen-Informationen' }, href: '/allergens' },
+      link: { label: { en: 'Allergen information', de: 'Allergen-Informationen' }, page: 'allergens' },
       handoff: true,
     },
     {
       // TO CONFIRM: spice levels per dish
       id: 'spice',
-      label: 'Spice level',
+      label: { en: 'Spice level', de: 'Schärfe' },
       examples: [
         'How spicy is the food?',
         'Can you make it mild?',
@@ -268,7 +281,7 @@ export const chatConfig = {
     },
     {
       id: 'pickup',
-      label: 'Pickup',
+      label: { en: 'Pickup', de: 'Abholung' },
       examples: [
         'Can I pick up my order?',
         'Do you do takeaway?',
@@ -279,16 +292,17 @@ export const chatConfig = {
         'Essen zum Mitnehmen',
       ],
       keywords: ['pickup', 'pick up', 'collect', 'takeaway', 'take away', 'discount', 'abhol', 'mitnehmen', 'rabatt'],
-      // TO CONFIRM: how pickup orders are placed (phone?)
+      // TO CONFIRM: the web shop (from the old website) and the phone are the ways to order for pickup
       reply: {
-        en: `Yes! You can pick up your order at ${street} – and you get 15% off when you collect it yourself 🥡 Call us on ${phone} to order.`,
-        de: `Ja! Sie können Ihre Bestellung in der ${street} abholen – bei Selbstabholung bekommen Sie 15 % Rabatt 🥡 Bestellen Sie telefonisch unter ${phone}.`,
+        en: `Yes! Order in our web shop or call us on ${phone}, then pick it up at ${street} – you get 15% off when you collect it yourself 🥡`,
+        de: `Ja! Bestellen Sie in unserem Webshop oder telefonisch unter ${phone} und holen Sie in der ${street} ab – bei Selbstabholung bekommen Sie 15 % Rabatt 🥡`,
       },
+      link: { label: { en: 'Open the web shop', de: 'Zum Webshop' }, href: siteInfo.orderLinks.webshop },
       related: ['hours', 'location'],
     },
     {
       id: 'prices',
-      label: 'Prices',
+      label: { en: 'Prices', de: 'Preise' },
       examples: [
         'How much does the food cost?',
         'What are your prices?',
@@ -302,13 +316,13 @@ export const chatConfig = {
         lang === 'de'
           ? `Unsere Preise:\n${priceRanges(lang).join('\n')}\nBei Selbstabholung sparen Sie 15 %.`
           : `Our prices:\n${priceRanges(lang).join('\n')}\nPick up yourself and save 15%.`,
-      link: { label: { en: 'See the full menu', de: 'Zur Speisekarte' }, href: '/menu' },
+      link: { label: { en: 'See the full menu', de: 'Zur Speisekarte' }, page: 'menu' },
       related: ['pickup', 'food'],
     },
     {
       // TO CONFIRM: what's on this week (the three rotating specials)
       id: 'weekly',
-      label: 'Weekly specials',
+      label: { en: 'Weekly specials', de: 'Thali der Woche' },
       examples: [
         'What are this week’s specials?',
         'What is the special today?',
@@ -321,13 +335,13 @@ export const chatConfig = {
         en: 'Our Grand Thali and Premium Slides change every week, and on Fridays we serve biryani 🍛 Ask our team what’s on this week!',
         de: 'Unser Grand Thali und die Premium Slides wechseln jede Woche, und freitags gibt es Biryani 🍛 Fragen Sie unser Team, was diese Woche auf der Karte steht!',
       },
-      link: { label: { en: 'This week’s specials', de: 'Specials der Woche' }, href: '/weekly-specials' },
+      link: { label: { en: 'This week’s specials', de: 'Zum Thali der Woche' }, page: 'weekly' },
       handoff: true,
     },
     {
       // TO CONFIRM: payment methods besides PayPal
       id: 'payment',
-      label: 'Payment',
+      label: { en: 'Payment', de: 'Bezahlung' },
       examples: [
         'Can I pay by card?',
         'Do you accept PayPal?',
@@ -343,9 +357,10 @@ export const chatConfig = {
       },
     },
     {
-      // TO CONFIRM: whether and how table bookings work
+      // The content plan: BCC is a cloud kitchen (pickup, delivery, catering), not a sit-down
+      // restaurant. TO CONFIRM with the client.
       id: 'booking',
-      label: 'Table booking',
+      label: { en: 'Table booking', de: 'Tisch reservieren' },
       examples: [
         'Can I book a table?',
         'Do I need a reservation?',
@@ -355,15 +370,15 @@ export const chatConfig = {
       ],
       keywords: ['reserv', 'book', 'table', 'seat', 'tisch'],
       reply: {
-        en: `Please give us a call on ${phone} to ask about a table.`,
-        de: `Rufen Sie uns gern unter ${phone} an, um nach einem Tisch zu fragen.`,
+        en: 'We’re a cloud kitchen: we cook for pickup and delivery, so there are no tables to book. Order in our web shop and pick it up, or have it delivered with Wolt or Uber Eats. Planning something for a group? Ask us about catering 🎉',
+        de: 'Wir sind eine Cloud-Küche: Wir kochen zum Abholen und Liefern, deshalb gibt es keine Tische zu reservieren. Bestellen Sie im Webshop und holen Sie ab, oder lassen Sie über Wolt oder Uber Eats liefern. Etwas für eine Gruppe geplant? Fragen Sie uns nach Catering 🎉',
       },
-      related: ['hours', 'location'],
+      related: ['wolt', 'catering'],
     },
     {
       // TO CONFIRM: halal
       id: 'halal',
-      label: 'Halal',
+      label: { en: 'Halal', de: 'Halal' },
       examples: ['Is your meat halal?', 'Do you serve halal food?', 'Is the chicken halal?', 'Ist das Fleisch halal?'],
       keywords: ['halal'],
       reply: {
@@ -375,7 +390,7 @@ export const chatConfig = {
     {
       // TO CONFIRM: how refunds and complaints are handled
       id: 'complaint',
-      label: 'Problem with an order',
+      label: { en: 'Problem with an order', de: 'Problem mit einer Bestellung' },
       examples: [
         'My order was wrong',
         'I want a refund',
@@ -393,7 +408,7 @@ export const chatConfig = {
     },
     {
       id: 'about',
-      label: 'About us',
+      label: { en: 'About us', de: 'Über uns' },
       examples: [
         'Who are you?',
         'Tell me about the restaurant',
@@ -406,12 +421,12 @@ export const chatConfig = {
         en: 'We do not just serve food – we serve culture! ✨ Beyond Chai & Curry brings regional Indian cooking to Stuttgart-Vaihingen, and we’ve served more than 10,000 thalis so far.',
         de: 'Wir servieren nicht nur Essen – wir servieren Kultur! ✨ Beyond Chai & Curry bringt regionale indische Küche nach Stuttgart-Vaihingen – mehr als 10.000 Thalis haben wir schon serviert.',
       },
-      link: { label: { en: 'Our story', de: 'Über uns' }, href: '/about' },
+      link: { label: { en: 'Our story', de: 'Unsere Geschichte' }, page: 'about' },
       related: ['food'],
     },
     {
       id: 'instagram',
-      label: 'Instagram',
+      label: { en: 'Instagram', de: 'Instagram' },
       examples: ['Are you on Instagram?', 'Do you have social media?', 'Seid ihr auf Instagram?'],
       keywords: ['instagram', 'insta', 'social', 'facebook'],
       reply: {
@@ -422,7 +437,7 @@ export const chatConfig = {
     },
     {
       id: 'assistant',
-      label: 'About this chat',
+      label: { en: 'About this chat', de: 'Über diesen Chat' },
       examples: ['Are you a bot?', 'Am I talking to a real person?', 'Are you human?', 'Bist du ein Bot?'],
       keywords: ['bot', 'robot', 'chatbot'],
       reply: {
@@ -465,9 +480,10 @@ export const chatConfig = {
   smallTalkFiller: ['you', 'u', 'so', 'much', 'very', 'a', 'lot', 'there', 'and', 'have', 'nice', 'day', 'all', 'good', 'sehr', 'vielen', 'dir', 'ihnen', 'schön', 'noch', 'einen', 'schönen'],
 
   // Answer to anything the bot can't place
+  // (the website chat shows the "Open WhatsApp" button with it, and the topic buttons below)
   fallbackReply: {
-    en: 'Sorry, I don’t know that one yet 🙈 Try asking in a different way, or pick a topic below.',
-    de: 'Das weiß ich leider noch nicht 🙈 Versuchen Sie es mit anderen Worten, oder wählen Sie unten ein Thema.',
+    en: 'Sorry, I don’t know that one yet 🙈 Try asking in a different way, pick a topic below, or ask our team directly:',
+    de: 'Das weiß ich leider noch nicht 🙈 Versuchen Sie es mit anderen Worten, wählen Sie unten ein Thema, oder fragen Sie direkt unser Team:',
   },
   // When a message could mean more than one thing: the likely answers follow as suggestions
   unsureReply: {
@@ -477,8 +493,11 @@ export const chatConfig = {
   // Put in front of the first answer when a message starts with a greeting
   greetingPrefix: { en: 'Hi! 👋 ', de: 'Hallo! 👋 ' },
 
-  // Shown if getting a reply fails (e.g. the server can't be reached), together with the WhatsApp button.
-  errorReply: 'Sorry, something went wrong on our side. Please try again, or chat with our team on WhatsApp.',
+  // Shown if working out a reply fails, together with the WhatsApp button.
+  errorReply: {
+    en: 'Sorry, something went wrong on our side. Please try again, or chat with our team on WhatsApp.',
+    de: 'Entschuldigung, da ist etwas schiefgelaufen. Bitte versuchen Sie es noch einmal, oder schreiben Sie unserem Team per WhatsApp.',
+  },
 
   // WhatsApp bot only: there are no topic buttons, so it sends the topics as a numbered menu.
   whatsapp: {

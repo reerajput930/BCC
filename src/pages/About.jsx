@@ -131,7 +131,7 @@ export default function About() {
             {t({ de: 'uns', en: 'Us' })}
           </span>
         </h1>
-        <p className="about-hero__intro">
+        <p className="about-hero__intro" data-reveal="up">
           <strong>{t(intro.lead)}</strong> {t(intro.rest)}
         </p>
       </section>
@@ -158,8 +158,8 @@ export default function About() {
       </section>
 
       <section className="about-roots" aria-label={t({ de: 'Unser Essen', en: 'Our food' })}>
-        <img className="about-roots__tree" src={bananaTree} width="421" height="537" alt="" />
-        <p className="about-roots__text">
+        <img className="about-roots__tree" data-reveal="left" src={bananaTree} width="421" height="537" alt="" />
+        <p className="about-roots__text" data-reveal="right">
           {t(roots).map((part, i) => (part.lead ? <strong key={i}>{part.lead}</strong> : <span key={i}>{part.text}</span>))}
         </p>
       </section>
@@ -168,7 +168,7 @@ export default function About() {
         <h2 id="founders-title" className="about-founders__title">
           {t({ de: 'Gründerinnen', en: 'Founders' })}
         </h2>
-        <div className="about-founders__feature">
+        <div className="about-founders__feature" data-reveal="up">
           <div className="about-founders__photo">
             {founders.photo ? (
               <img src={founders.photo} alt="" />
@@ -178,7 +178,7 @@ export default function About() {
           </div>
           <p className="about-founders__names">{founders.names ?? <Placeholder>{t({ de: 'Namen der Gründerinnen', en: 'Founder names' })}</Placeholder>}</p>
         </div>
-        <p className="about-founders__story">
+        <p className="about-founders__story" data-reveal="up">
           {founders.story ?? <Placeholder>{t({ de: 'Die Geschichte der Gründerinnen', en: 'The founders’ story' })}</Placeholder>}
         </p>
       </section>

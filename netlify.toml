@@ -1,5 +1,5 @@
-# Netlify builds the site and serves it. The chat bot's server (server/) isn't hosted here: until
-# it runs somewhere, the chat answers with its error reply and the WhatsApp button.
+# Netlify builds the site and serves it. The website chat answers in the visitor's browser
+# (src/chatbot/), so it needs no server; server/ is only for the optional WhatsApp bot.
 [build]
   command = "npm run build"
   publish = "dist"

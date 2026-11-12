@@ -152,7 +152,7 @@ export default function WeeklySpecials() {
       />
 
       <section className="ws-hero" aria-labelledby="ws-title">
-        <div className="ws-hero__text">
+        <div className="ws-hero__text" data-reveal="left">
           <h1 id="ws-title" className="ws-hero__title">
             {region} <span>{t({ de: 'Thali der Woche', en: 'Weekly Special' })}</span>
           </h1>
@@ -165,13 +165,13 @@ export default function WeeklySpecials() {
       </section>
 
       <section className="ws-fact" aria-label={t({ de: 'Wusstest du?', en: 'Did you know?' })}>
-        <div>
+        <div data-reveal="left">
           <p className="ws-fact__eyebrow">{t({ de: 'Wusstest du?', en: 'Did You Know?' })}</p>
           <p className="ws-fact__title">
             <strong>{fact.place}</strong> {t(fact.rest)}
           </p>
         </div>
-        <img className="ws-fact__art" src={chappalTools} width="720" height="411" alt="" />
+        <img className="ws-fact__art" data-reveal="right" src={chappalTools} width="720" height="411" alt="" />
       </section>
 
       <div ref={journeyRef} className="ws-journey">

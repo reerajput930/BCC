@@ -2,6 +2,7 @@ import { Fragment, useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { chatConfig } from '../chatConfig.js'
 import { getReply, pause, typingTime } from '../chatReplies.js'
+import { useT } from '../i18n.js'
 import { siteInfo, whatsappUrl } from '../siteInfo.js'
 import { ChatBubbleIcon, CloseIcon, ReadTicksIcon, SendIcon, WhatsAppIcon } from './ChatIcons.jsx'
 import LogoMark from './LogoMark.jsx'
@@ -10,7 +11,8 @@ import LogoMark from './LogoMark.jsx'
 const TOUCH_LABEL_DELAY_MS = 300
 const TOUCH_LABEL_DURATION_MS = 3000
 
-// The "Talk to human" button appears after this many messages from the visitor
+// The "Talk to our team" button appears after this many messages from the visitor, or straight
+// after a question the bot couldn't answer
 const HUMAN_AFTER_MESSAGES = 2
 
 const clockTime = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -34,33 +36,41 @@ function ReplyLink({ link, onNavigate }) {
   )
 }
 
-// "Talk to human": button into WhatsApp with our team, email for anyone without WhatsApp
+// "Talk to our team": button into WhatsApp with our team, email for anyone without WhatsApp
 function Handoff() {
+  const { t } = useT()
   return (
     <span className="chat-handoff">
       <a className="chat-handoff__whatsapp" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
         <WhatsAppIcon />
-        Open WhatsApp
+        {t({ de: 'WhatsApp öffnen', en: 'Open WhatsApp' })}
       </a>
       <span className="chat-handoff__email">
-        No WhatsApp? Email us at <a href={`mailto:${siteInfo.email}`}>{siteInfo.email}</a>
+        {t({ de: 'Kein WhatsApp? Schreiben Sie uns an', en: 'No WhatsApp? Email us at' })}{' '}
+        <a href={`mailto:${siteInfo.email}`}>{siteInfo.email}</a>
       </span>
     </span>
   )
 }
 
 export default function ChatWidget() {
+  const { t, lang } = useT()
   const [open, setOpen] = useState(false)
   const [labelShown, setLabelShown] = useState(false)
-  const [messages, setMessages] = useState(() => [
-    { id: 0, from: 'bot', text: chatConfig.welcome, time: clockTime() },
-  ])
+  // The welcome is shown in the page's language, also after switching DE / EN
+  const [messages, setMessages] = useState(() => [{ id: 0, from: 'bot', welcome: true, time: clockTime() }])
   const [draft, setDraft] = useState('')
   const [waiting, setWaiting] = useState(false)
   const sentCount = messages.filter((message) => message.from === 'user').length
+  const showHuman = sentCount >= HUMAN_AFTER_MESSAGES || messages.some((message) => message.fallback)
   const nextId = useRef(1)
-  // What the last reply was about (language, topic, dishes), sent along with the next message
-  const context = useRef({})
+  // What the last reply was about (language, topic, dishes), sent along with the next message.
+  // The bot answers in the page's language until the visitor writes in the other one.
+  const context = useRef({ lang })
+
+  useEffect(() => {
+    context.current = { ...context.current, lang }
+  }, [lang])
   const wasOpen = useRef(false)
   const rootRef = useRef(null)
   const fabRef = useRef(null)
@@ -154,7 +164,7 @@ export default function ChatWidget() {
         addMessage('bot', reply)
       }
     } catch {
-      addMessage('bot', { text: chatConfig.errorReply, handoff: true })
+      addMessage('bot', { text: t(chatConfig.errorReply), handoff: true, fallback: true })
     } finally {
       setWaiting(false)
     }
@@ -191,20 +201,28 @@ export default function ChatWidget() {
                 {siteInfo.name}
               </h2>
               <p className="chat-window__status" aria-hidden="true">
-                {waiting ? 'typing…' : 'online'}
+                {waiting ? t({ de: 'schreibt …', en: 'typing…' }) : 'online'}
               </p>
             </div>
-            <button type="button" className="chat-window__close" aria-label="Close chat" onClick={close}>
+            <button
+              type="button"
+              className="chat-window__close"
+              aria-label={t({ de: 'Chat schließen', en: 'Close chat' })}
+              onClick={close}
+            >
               <CloseIcon />
             </button>
           </header>
 
           <div ref={bodyRef} className="chat-window__body">
-            <p className="chat-chip chat-chip--day">Today</p>
+            <p className="chat-chip chat-chip--day">{t({ de: 'Heute', en: 'Today' })}</p>
             <p className="chat-chip chat-chip--note">
-              You’re chatting with our assistant. Our team is on WhatsApp too.
+              {t({
+                de: 'Sie chatten mit unserem Assistenten. Unser Team erreichen Sie auch per WhatsApp.',
+                en: 'You’re chatting with our assistant. Our team is on WhatsApp too.',
+              })}
             </p>
-            <div className="chat-log" role="log" aria-label="Conversation">
+            <div className="chat-log" role="log" aria-label={t({ de: 'Unterhaltung', en: 'Conversation' })}>
               {messages.map((message, i) => (
                 <Fragment key={message.id}>
                   <div
@@ -213,9 +231,9 @@ export default function ChatWidget() {
                     }`}
                   >
                     <span className="visually-hidden">
-                      {message.from === 'bot' ? `${siteInfo.name}: ` : 'You: '}
+                      {message.from === 'bot' ? `${siteInfo.name}: ` : t({ de: 'Sie: ', en: 'You: ' })}
                     </span>
-                    {message.text}
+                    {message.welcome ? t(chatConfig.welcome) : message.text}
                     {message.link && <ReplyLink link={message.link} onNavigate={close} />}
                     {message.handoff && <Handoff />}
                     <span className="chat-msg__meta" aria-hidden="true">
@@ -225,7 +243,7 @@ export default function ChatWidget() {
                   </div>
                   {/* Follow-up suggestions, only under the latest message */}
                   {message.suggestions && i === messages.length - 1 && !waiting && (
-                    <div className="chat-suggestions" role="group" aria-label="Suggestions">
+                    <div className="chat-suggestions" role="group" aria-label={t({ de: 'Vorschläge', en: 'Suggestions' })}>
                       {message.suggestions.map((suggestion) => (
                         <button
                           key={suggestion.label}
@@ -241,7 +259,9 @@ export default function ChatWidget() {
               ))}
               {waiting && (
                 <div className="chat-msg chat-msg--bot is-first chat-typing">
-                  <span className="visually-hidden">{siteInfo.name} is typing…</span>
+                  <span className="visually-hidden">
+                    {t({ de: `${siteInfo.name} schreibt …`, en: `${siteInfo.name} is typing…` })}
+                  </span>
                   <span className="chat-typing__dots" aria-hidden="true">
                     <i />
                     <i />
@@ -251,21 +271,21 @@ export default function ChatWidget() {
               )}
             </div>
 
-            <div className="chat-quick" role="group" aria-label="Quick replies">
+            <div className="chat-quick" role="group" aria-label={t({ de: 'Themen', en: 'Topics' })}>
               {chatConfig.quickReplies.map((quickReply) => {
                 const human = quickReply.id === 'human'
-                // "Talk to human" shows once the visitor has given the bot a try
-                if (human && sentCount < HUMAN_AFTER_MESSAGES) return null
+                // "Talk to our team" shows once the visitor has given the bot a try
+                if (human && !showHuman) return null
                 return (
                   <button
                     key={quickReply.id}
                     type="button"
                     className={human ? 'chat-quick__human' : undefined}
                     disabled={waiting}
-                    onClick={() => ask(quickReply.label, quickReply)}
+                    onClick={() => ask(t(quickReply.label), quickReply)}
                   >
                     {human && <WhatsAppIcon />}
-                    {quickReply.label}
+                    {t(quickReply.label)}
                   </button>
                 )
               })}
@@ -275,7 +295,7 @@ export default function ChatWidget() {
           <div className="chat-window__composer">
             <form className="chat-form" onSubmit={handleSubmit}>
               <label className="visually-hidden" htmlFor={inputId}>
-                Message
+                {t({ de: 'Nachricht', en: 'Message' })}
               </label>
               <input
                 ref={inputRef}
@@ -283,11 +303,11 @@ export default function ChatWidget() {
                 type="text"
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="Message"
+                placeholder={t({ de: 'Nachricht', en: 'Message' })}
                 autoComplete="off"
                 maxLength={500}
               />
-              <button type="submit" aria-label="Send" disabled={!draft.trim() || waiting}>
+              <button type="submit" aria-label={t({ de: 'Senden', en: 'Send' })} disabled={!draft.trim() || waiting}>
                 <SendIcon />
               </button>
             </form>
@@ -299,13 +319,13 @@ export default function ChatWidget() {
         ref={fabRef}
         type="button"
         className={labelShown ? 'chat-fab is-labelled' : 'chat-fab'}
-        aria-label="Chat with us"
+        aria-label={t({ de: 'Chatten Sie mit uns', en: 'Chat with us' })}
         aria-expanded={open}
         aria-controls={windowId}
         onClick={() => setOpen(true)}
       >
         <span className="chat-fab__label" aria-hidden="true">
-          Chat with us
+          {t({ de: 'Chat mit uns', en: 'Chat with us' })}
         </span>
         <span className="chat-fab__icon">
           <ChatBubbleIcon />

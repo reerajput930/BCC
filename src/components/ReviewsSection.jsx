@@ -101,7 +101,7 @@ export default function ReviewsSection() {
   return (
     <section className="reviews" aria-labelledby="reviews-title">
       <div className="reviews__inner">
-        <header className="reviews__header">
+        <header className="reviews__header" data-reveal="up">
           <div className="reviews__ornament">
             <LotusOrnament />
           </div>
@@ -142,7 +142,7 @@ export default function ReviewsSection() {
           </div>
         </header>
 
-        <div className="reviews__grid">
+        <div className="reviews__grid" data-reveal="zoom">
           {featuredReviews.slice(0, 6).map((review, index) => (
             <ReviewCard key={review.name + review.quote} review={review} slot={index + 1} />
           ))}

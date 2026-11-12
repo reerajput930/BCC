@@ -47,7 +47,7 @@ function LocationMap() {
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
       />
-      <div className="contact-map__card">
+      <div className="contact-map__card" data-reveal="up">
         <address>
           {street}
           <br />
@@ -95,12 +95,12 @@ function OrderOptions() {
 
   return (
     <section id="order" className="contact-order" aria-labelledby="contact-order-title">
-      <h2 id="contact-order-title" className="contact-order__title">
+      <h2 id="contact-order-title" className="contact-order__title" data-reveal="up">
         {t({ de: 'So bestellst du', en: 'How to order' })}
       </h2>
       <ul className="contact-order__options">
-        {options.map((option) => (
-          <li key={option.name}>
+        {options.map((option, i) => (
+          <li key={option.name} data-reveal="up" style={{ '--reveal-delay': `${i * 0.08}s` }}>
             <a
               className="contact-order__option"
               href={option.href}
@@ -112,7 +112,7 @@ function OrderOptions() {
           </li>
         ))}
       </ul>
-      <p className="contact-order__area">
+      <p className="contact-order__area" data-reveal="up">
         <span className="contact-label">{t({ de: 'Liefergebiet', en: 'Delivery area' })}</span>
         <Placeholder>{t({ de: 'Liefergebiet', en: 'Delivery area' })}</Placeholder>
       </p>
@@ -137,10 +137,10 @@ export default function Contact() {
       />
 
       <section className="contact-hero" aria-labelledby="contact-page-title">
-        <h1 id="contact-page-title" className="contact-hero__title">
+        <h1 id="contact-page-title" className="contact-hero__title" data-reveal="left">
           {t({ de: 'Bestellen & Kontakt', en: 'Order & Contact' })}
         </h1>
-        <div className="contact-hero__aside">
+        <div className="contact-hero__aside" data-reveal="right">
           <p className="contact-hero__intro">
             <strong>{t(intro.lead)}</strong> {t(intro.rest)}
           </p>
@@ -162,8 +162,8 @@ export default function Contact() {
       <OrderOptions />
 
       <section className="contact-hours" aria-labelledby="contact-hours-title">
-        <img className="contact-hours__shutter" src={shutter} width="373" height="495" alt="" />
-        <div>
+        <img className="contact-hours__shutter" data-reveal="left" src={shutter} width="373" height="495" alt="" />
+        <div data-reveal="right">
           <h2 id="contact-hours-title" className="contact-hours__title">
             {t({ de: 'Öffnungszeiten', en: 'Opening Times' })}
           </h2>
@@ -188,7 +188,7 @@ export default function Contact() {
       </section>
 
       <section className="contact-reach" aria-labelledby="contact-reach-title">
-        <div>
+        <div data-reveal="left">
           <h2 id="contact-reach-title" className="contact-label">
             {t({ de: 'Kontakt', en: 'Contact' })}
           </h2>
@@ -197,7 +197,7 @@ export default function Contact() {
             <a href={phone.href}>{phone.display}</a>
           </p>
         </div>
-        <img className="contact-reach__phone" src={telephone} width="676" height="676" alt="" />
+        <img className="contact-reach__phone" data-reveal="right" src={telephone} width="676" height="676" alt="" />
       </section>
 
       <LocationMap />
@@ -206,7 +206,9 @@ export default function Contact() {
         <h2 id="contact-form-title" className="visually-hidden">
           {t({ de: 'Schreib uns', en: 'Write to us' })}
         </h2>
-        <EnquiryForm kind="contact" />
+        <div data-reveal="up">
+          <EnquiryForm kind="contact" />
+        </div>
       </section>
     </div>
   )

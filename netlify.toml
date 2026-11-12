@@ -1,0 +1,21 @@
+# Netlify builds the site and serves it. The chat bot's server (server/) isn't hosted here: until
+# it runs somewhere, the chat answers with its error reply and the WhatsApp button.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Every address is handled by the app (React Router), e.g. /speisekarte/ or /en/menu/
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Preview for the client only: keeps search engines away. Remove this block when the site goes
+# live on the client's domain.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"

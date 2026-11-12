@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="115" height="115" viewBox="0 0 115 115" fill="none" stroke="#f5f0e8" stroke-opacity="0.1" stroke-width="1.2">
+  <!-- circle with an inscribed diamond in the middle of the tile -->
+  <circle cx="57.5" cy="57.5" r="32.5" />
+  <path d="M57.5 25 90 57.5 57.5 90 25 57.5Z" />
+  <!-- plain circles on the corners; neighbouring tiles complete them -->
+  <circle cx="0" cy="0" r="32.5" />
+  <circle cx="115" cy="0" r="32.5" />
+  <circle cx="0" cy="115" r="32.5" />
+  <circle cx="115" cy="115" r="32.5" />
+</svg>

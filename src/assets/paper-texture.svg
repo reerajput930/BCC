@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640">
+  <!-- Crumpled paper for the review cards: wrinkles lit from the top left, fine grain and two fold
+       lines. The noise is stitched, so the tile repeats without seams. -->
+  <filter id="paper" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.005" numOctaves="4" seed="7" stitchTiles="stitch" result="wrinkles" />
+    <feTurbulence type="turbulence" baseFrequency="0.0035" numOctaves="3" seed="19" stitchTiles="stitch" result="crumple" />
+    <feComposite in="wrinkles" in2="crumple" operator="arithmetic" k2="0.55" k3="0.6" result="height" />
+    <feDiffuseLighting in="height" surfaceScale="3" diffuseConstant="1" lighting-color="#fff" result="relief">
+      <feDistantLight azimuth="200" elevation="60" />
+    </feDiffuseLighting>
+    <!-- Paper colour, lighter or darker by how the wrinkles catch the light -->
+    <feFlood flood-color="#e3dccd" result="base" />
+    <feComposite in="relief" in2="base" operator="arithmetic" k2="1.3" k3="1" k4="-1.12" result="paper" />
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" stitchTiles="stitch" result="grain" />
+    <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.32  0 0 0 0 0.27  0.12 0 0 0 -0.045" result="specks" />
+    <feComposite in="specks" in2="paper" operator="over" />
+  </filter>
+  <rect width="640" height="640" filter="url(#paper)" />
+  <g fill="none" stroke-linecap="round">
+    <path d="M-10 236 L650 196" stroke="#fff" stroke-opacity=".45" stroke-width="1.2" />
+    <path d="M-10 237.6 L650 197.6" stroke="#6b604c" stroke-opacity=".1" stroke-width="1.4" />
+    <path d="M402 -10 L436 650" stroke="#fff" stroke-opacity=".35" stroke-width="1" />
+    <path d="M403.6 -10 L437.6 650" stroke="#6b604c" stroke-opacity=".08" stroke-width="1.3" />
+  </g>
+</svg>

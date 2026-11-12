@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="187.5" height="187.5" viewBox="0 0 187.5 187.5" fill="none" stroke="#322e2b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <!-- samosa -->
+  <path d="M37.5 33 L53.5 62 H21.5 Z" />
+  <path d="M37.5 37 V61" stroke-dasharray="4 3.2" stroke-linecap="butt" />
+  <!-- plus -->
+  <path d="M63.5 32 V45 M57 38.5 H70" />
+  <!-- smiling bowl -->
+  <path d="M120 42 H166.5 M124.5 42 Q143 64 162 42" />
+  <path d="M130.5 34.5 Q135.5 28 140.5 34.5 M144 33.5 Q149 27 154 33.5" />
+  <!-- herb sprig -->
+  <path d="M87.5 83 V129 M76 86.5 L87.5 94 L99.5 86.5 M76 97.5 L87.5 105 L99.5 97.5 M76 108.5 L87.5 116 L99.5 108.5" />
+  <!-- small leaf -->
+  <path d="M138.5 107 C137 92 148 80.5 166 80 C156 88 146 96 138.5 107 M152 92 L159.5 95.5 M146.5 99 L155 102.5" />
+  <!-- long leaf -->
+  <path d="M21.5 130 L30 138 M30 137.5 C42 135 56 146 60 158 C48 157 36 150 30 137.5 Z" />
+  <!-- shooting star -->
+  <path d="M114 139.5 Q136 128 158 140 M119 149 Q140 136 159 148" />
+  <path d="M166 132.5 L168.8 138.6 L175.5 139.4 L170.6 144 L171.9 150.6 L166 147.3 L160.1 150.6 L161.4 144 L156.5 139.4 L163.2 138.6 Z" />
+  <!-- dots -->
+  <g fill="#322e2b" stroke="none">
+    <circle cx="22" cy="102" r="3.4" />
+    <circle cx="70.5" cy="170" r="3.4" />
+    <circle cx="106" cy="170" r="3.4" />
+    <circle cx="165.5" cy="170" r="3.4" />
+  </g>
+</svg>
